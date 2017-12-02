@@ -2,6 +2,7 @@ CREATE CONSTRAINT ON (a:artist) ASSERT a.artistName IS UNIQUE;
 CREATE CONSTRAINT ON (f:feature) ASSERT f.artistName IS UNIQUE;
 CREATE CONSTRAINT ON (f:feature1) ASSERT f.artistName IS UNIQUE;
 
+
 USING PERIODIC COMMIT
     LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artist-test.csv' as line
 MERGE (artist:Artist {artistName: line.Artist})
