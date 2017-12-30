@@ -1,16 +1,39 @@
-CREATE CONSTRAINT ON (a:artist) ASSERT a.artistName IS UNIQUE;
-CREATE CONSTRAINT ON (f:feature) ASSERT f.artistName IS UNIQUE;
-CREATE CONSTRAINT ON (f:feature1) ASSERT f.artistName IS UNIQUE;
+CREATE CONSTRAINT ON (a:Artist) ASSERT a.artistName IS UNIQUE;
+## DONT NEED? CREATE CONSTRAINT ON (f:feature) ASSERT f.artistName IS UNIQUE;
+## DONT NEED?  CREATE CONSTRAINT ON (f:feature1) ASSERT f.artistName IS UNIQUE;
 
-
+# To import the data
 USING PERIODIC COMMIT
     LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artist-test.csv' as line
 MERGE (artist:Artist {artistName: line.Artist})
-MERGE (feature:Artist {artistName: line.Feature1})
-MERGE (feature1:Artist {artistName: line.Feature2})
+MERGE (feature1:Artist {artistName: line.Feature1})
+MERGE (feature2:Artist {artistName: line.Feature2})
+MERGE (feature3:Artist {artistName: line.Feature3})
+
 CREATE (artist)-[:FEATURES {strength:1}]->(feature)
 CREATE (artist)-[:FEATURES {strength:1}]->(feature1)
 
+# To delete the connections to ’None’ for when there isn’t a feature in that column
 MATCH (artist:Artist {artistName:'None'})
 OPTIONAL MATCH (artist)-[r]-() 
 DELETE artist, r 
+
+# For making the strength of features
+MERGE (artist)-[f1:FEATURES]->(feature1) 
+ON CREATE SET f1.strength = 1
+ON MATCH SET f1.strength = f1.strength + 1
+
+MERGE (artist)-[f2:FEATURES]->(feature2) 
+ON CREATE SET f2.strength = 1
+ON MATCH SET f2.strength = f2.strength + 1
+
+MERGE (artist)-[f3:FEATURES]->(feature3) 
+ON CREATE SET f3.strength = 1
+ON MATCH SET f3.strength = f3.strength + 1
+
+# To match an artist
+MATCH (a:Artist {artistName: ‘Eminem’ })
+
+# To match all features
+MATCH (a:Artist {artistName: ‘Eminem’ })—-(f:Feature) 
+RETURN f.artistName
