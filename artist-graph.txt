@@ -1,3 +1,5 @@
+CREATE CONSTRAINT ON (a:Artist) ASSERT a.artistName IS UNIQUE;.
+
 USING PERIODIC COMMIT 50
     LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
 MERGE (artist:Artist {artistName: line.Artist})
