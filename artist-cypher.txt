@@ -62,3 +62,28 @@ ON MATCH SET f2.strength = f2.strength + 1
 MERGE (:Artist {artistName: line.Artist})-[f3:Features]—(feature3:Artist {artistName: line.Feature3})
 ON CREATE SET f3.strength = 1
 ON MATCH SET f3.strength = f3.strength + 1
+
+# MERGE on a relationship - to create feature relationships with strength property
+
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artist-test.csv' as line
+MATCH (artist:Artist { name: line.Artist }), (feature1:Artist { name: line.Feature1 })
+MERGE (artist)-[f1:FEATURED]->(feature1)
+ON CREATE SET f1.strength = 1
+ON MATCH SET f1.strength = f1.strength + 1
+RETURN artist.name, type(r), feature1.name
+
+MATCH (artist:Artist { name: line.Artist }), (feature2:Artist { name: line.Feature2 })
+MERGE (artist)-[f1:FEATURED]->(feature2)
+ON CREATE SET f2.strength = 1
+ON MATCH SET f2.strength = f2.strength + 1
+RETURN artist.name, type(r), feature2.name
+
+MATCH (artist:Artist { name: line.Artist }), (feature3:Artist { name: line.Feature3 })
+MERGE (artist)-[f1:FEATURED]->(feature3)
+ON CREATE SET f3.strength = 1
+ON MATCH SET f3.strength = f3.strength + 1
+RETURN artist.name, type(r), feature3.name
+
+
+
