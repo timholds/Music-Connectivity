@@ -1,6 +1,48 @@
-CREATE CONSTRAINT ON (a:Artist) ASSERT a.artistName IS UNIQUE;
-## DONT NEED? CREATE CONSTRAINT ON (f:feature) ASSERT f.artistName IS UNIQUE;
-## DONT NEED?  CREATE CONSTRAINT ON (f:feature1) ASSERT f.artistName IS UNIQUE;
+CREATE CONSTRAINT ON (a:Artist) ASSERT a.name IS UNIQUE;
+
+# Get the nodes 
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists.csv' as line
+MERGE (artist:Artist {artistName: line.Artist})
+
+# Make relationships
+# MERGE on a relationship - to create feature relationships with strength property
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MATCH (artist:Artist { name: line.Artist }), (feature1:Artist { name: line.Feature1 })
+MERGE (artist)-[f1:FEATURED]->(feature1)
+ON CREATE SET f1.strength = 1
+ON MATCH SET f1.strength = f1.strength + 1
+RETURN artist.name, type(f1), feature1.name
+
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MATCH (artist:Artist { name: line.Artist }), (feature2:Artist { name: line.Feature2 })
+MERGE (artist)-[f2:FEATURED]->(feature2)
+ON CREATE SET f2.strength = 1
+ON MATCH SET f2.strength = f2.strength + 1
+RETURN artist.name, type(f2), feature2.name
+
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MATCH (artist:Artist { name: line.Artist }), (feature3:Artist { name: line.Feature3 })
+MERGE (artist)-[f3:FEATURED]->(feature3)
+ON CREATE SET f3.strength = 1
+ON MATCH SET f3.strength = f3.strength + 1
+RETURN artist.name, type(f3), feature3.name
+
+# Delete the connections to ’None’ for when there isn’t a feature in that column
+MATCH (artist:Artist { name:'None'})
+OPTIONAL MATCH (artist)-[r]-() 
+DELETE r 
+
+# Get the nodes with the most connections
+MATCH (a)-[:FEATURED]->(b)
+RETURN b, COLLECT(a) as artists
+ORDER BY SIZE(artists) DESC LIMIT 10
+
+
+
 
 # To import the data
 USING PERIODIC COMMIT 50
@@ -22,11 +64,6 @@ ON MATCH SET f2.strength = f2.strength + 1
 MERGE (artist)-[f3:FEATURES]->(feature3) 
 ON CREATE SET f3.strength = 1
 ON MATCH SET f3.strength = f3.strength + 1
-
-# To delete the connections to ’None’ for when there isn’t a feature in that column
-MATCH (artist:Artist {artistName:'None'})
-OPTIONAL MATCH (artist)-[r]-() 
-DELETE artist, r 
 
 
 # To match an artist
@@ -62,28 +99,5 @@ ON MATCH SET f2.strength = f2.strength + 1
 MERGE (:Artist {artistName: line.Artist})-[f3:Features]—(feature3:Artist {artistName: line.Feature3})
 ON CREATE SET f3.strength = 1
 ON MATCH SET f3.strength = f3.strength + 1
-
-# MERGE on a relationship - to create feature relationships with strength property
-
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artist-test.csv' as line
-MATCH (artist:Artist { name: line.Artist }), (feature1:Artist { name: line.Feature1 })
-MERGE (artist)-[f1:FEATURED]->(feature1)
-ON CREATE SET f1.strength = 1
-ON MATCH SET f1.strength = f1.strength + 1
-RETURN artist.name, type(r), feature1.name
-
-MATCH (artist:Artist { name: line.Artist }), (feature2:Artist { name: line.Feature2 })
-MERGE (artist)-[f1:FEATURED]->(feature2)
-ON CREATE SET f2.strength = 1
-ON MATCH SET f2.strength = f2.strength + 1
-RETURN artist.name, type(r), feature2.name
-
-MATCH (artist:Artist { name: line.Artist }), (feature3:Artist { name: line.Feature3 })
-MERGE (artist)-[f1:FEATURED]->(feature3)
-ON CREATE SET f3.strength = 1
-ON MATCH SET f3.strength = f3.strength + 1
-RETURN artist.name, type(r), feature3.name
-
 
 
