@@ -31,10 +31,26 @@ ON CREATE SET f3.strength = 1
 ON MATCH SET f3.strength = f3.strength + 1
 RETURN artist.name, type(f3), feature3.name
 
+USING PERIODIC COMMIT 50
+    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MATCH (artist:Artist { name: line.Artist }), (feature4:Artist { name: line.Feature4 })
+MERGE (artist)-[f4:FEATURED]->(feature4)
+ON CREATE SET f4.strength = 1
+ON MATCH SET f4.strength = f4.strength + 1
+RETURN artist.name, type(f4), feature4.name
+
 # Delete the connections to ’None’ for when there isn’t a feature in that column
 MATCH (artist:Artist { name:'None'})
 OPTIONAL MATCH (artist)-[r]-() 
 DELETE r 
+
+# List of people an artist has collated with
+MATCH (a:Artist { name: ‘Eminem’})-[f1:FEATURED]-(p:Artist)
+RETURN a, p, f1.strength
+
+
+# Delete relationships to self
+
 
 # Get the nodes with the most connections
 MATCH (a)-[:FEATURED]->(b)
@@ -44,6 +60,12 @@ ORDER BY SIZE(artists) DESC LIMIT 10
 
 
 
+
+
+
+
+
+# Old code
 # To import the data
 USING PERIODIC COMMIT 50
     LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artist-test.csv' as line
