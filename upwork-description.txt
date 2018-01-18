@@ -1,0 +1,92 @@
+I need someone to write a web scraper using Python to extract data from genius.com into a CSV. You may want to use the Genius API to help you generate path's to songs. 
+
+Data Scraping from Genius
+Please use Python and a data scraping framework to obtain a dataset. I will be reusing your code, so please make your code readable, document your work, and use comments.
+
+The dataset I need: a CSV with the following columns, with one row being one song, for every song available on Genius.com (500,000+):
+
+Song - (song title, like ‘Eleanor Rigby')
+Artist - (aritsts name, like ‘The Beatles'
+Album - (album the song belongs to, like ‘Sgt. Pepper’s Lonely Heart’s Club Band’
+
+At the top of a page, it says ‘Featuring’, ‘Produced By’, and ‘Album’. Split up the artsits in ‘Featuring' and 'Produced By’ (using regex?) and assign them to a column so that there is at most one artist per column. For example, if there is only 1 feature, then you can fill in the Feature2, Feature 3, etc columns as None. Similarly, if there are no features, then you can fill all 5 Feature columns as None.
+
+For example, the song at https://genius.com/Lil-wayne-boyz-2-menace-lyrics has “Produced by Bobby Kritical & DJ Plugg. We would want that row to have values of: Producer1 filled with ‘Bobby Kritical’ and Producer2 filled with ‘DJ Plugg’. Producer3, 4, 5 would all be set to ‘None’ for this row. Do this for both ‘Featuring' and 'Produced By’
+
+Producer1
+Producer2
+Producer3
+Producer4
+Producer5
+
+Feature1  
+Feature2
+Feature3
+Feature4
+Feature5
+
+CoverArtPhoto (at the top left of the page, under <img class="cover_art-image” > Save each song’s coverart as a .jpg in a folder called ‘ImgData’. Each song’s image should be in its own file, named like:  'Song-Title_Artist-Name.jpg’. In the CoverArtPhoto column of the csv, please put a link to the file name for that song’s coverart.
+
+For example, at the end of the scraping process, the CoverArtPhoto column should be filled with values like:
+‘ImgData/Yellow-Submarine_The-Beatles.jpg’
+‘ImgData/Hey-Jude_The-Beatles.jpg’
+‘ImgData/Eleanor-Rigby_The-Beatles.jpg’
+
+and there should be a folder named ‘LyricsData’ with a bunch of files like:
+'Yellow-Submarine_The-Beatles.jpg'
+'Hey-Jude_The-Beatles.jpg'
+'Eleanor-Rigby_The-Beatles.jpg’
+
+Views - the number above the ’Track Info’ section on the right side next to the eyeball icon. For example, this value might be “89,700”
+
+Contributors - the number to the right of views, with the camera icon.
+For example, this value might be “347"
+
+Writer1 (all writers in “Written By” section, under <span class="metadata_unit-info” in html)
+Writer2
+Writer3
+Writer4
+Writer5
+Writer6
+When there are multiple writers, split up the results in the “Written By” section so that there is only 1 writer per WriterX column. For example, if there are 5 writers, "Tank God, Carl Austin Rosen, Joey Bada$,Louis Bell, 21 Savage& Post Malone”, we would want the Writer1 column filled with ‘Tank God’,  the Writer2 column filled with ‘Carl Austin Rosen’,  the Writer3 column filled with ‘Joey Bada$’,  the Writer4 column filled with ’21 Savage’, the Writer5 column filled with ‘Post Malone’, and the  the Writer6 column filled with ’None’. Take note that they split up artists by both comma (,) and and sign (&).
+
+VideoDirector1 - When there are multiple video directors, split up the results in the “Written By” section so that there is only 1 writer per VideoDirectorX column.
+VideoDirector2
+
+Programmer1 - When there are multiple people under programming, split up the results in the “Programming” section so that there is only 1 writer per ProgrammingX column.
+Programmer2
+
+Recording
+Mixer
+Director of Photography
+Record Label
+
+Artwork1 - When there are multiple video directors, split up the results in the “Artwork” section so that there is only 1 writer per ArtworkX column.
+Artwork2
+Artwork3
+
+RecordedAt
+ReleaseDate (please get the specific release date and convert it into the format yyyy-MM-dd as in ‘2007-12-28' )
+ReleaseDateYear (please just get the year it was released only, as in ‘2007'
+
+Samples 
+Sampled In
+Interpolates
+Remix Of
+
+Lyrics (save each song’s lyrics as plaintext (txt) in a folder called ‘LyricsData’. Each song’s lyrics should be in their own file, named like:  'Song-Title_Artist-Name. txt’ Preserve all newline data.
+In the ‘Lyrics’ column of the dataframe, put a link to the txt file. If a song does not have lyrics available and thus you are not able to generate a txt file for that song’s lyrics, put None in the Lyrics category.)
+
+For example, at the end of the scraping process, the lyrics column should be filled with values like:
+‘LyricsData/Yellow-Submarine_The-Beatles. txt’
+‘LyricsData/Hey-Jude_The-Beatles. txt’
+
+
+and there should be a folder named ‘LyricsData’ with a bunch of files like:
+'Yellow-Submarine_The-Beatles. txt'
+'Hey-Jude_The-Beatles. txt'
+
+
+LinkToYoutube ( under class="song_media_controls-provider-icon”)
+
+In all of these columns, values that don’t exist should be set to ‘None’
