@@ -1,46 +1,29 @@
+# Create constraint, which creates index and helps upload go faster
 CREATE CONSTRAINT ON (a:Artist) ASSERT a.name IS UNIQUE;
 
 # Get the nodes 
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists.csv' as line
-MERGE (artist:Artist {artistName: line.Artist})
+USING PERIODIC COMMIT 5000
+LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MERGE (artist:Artist {name: line.Artist})
+
+# Repeat for columns line.Feature1 - line.Feature4
 
 # Make relationships
-# MERGE on a relationship - to create feature relationships with strength property
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
-MATCH (artist:Artist { name: line.Artist }), (feature1:Artist { name: line.Feature1 })
-MERGE (artist)-[f1:FEATURED]->(feature1)
-ON CREATE SET f1.strength = 1
-ON MATCH SET f1.strength = f1.strength + 1
-RETURN artist.name, type(f1), feature1.name
 
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
-MATCH (artist:Artist { name: line.Artist }), (feature2:Artist { name: line.Feature2 })
-MERGE (artist)-[f2:FEATURED]->(feature2)
-ON CREATE SET f2.strength = 1
-ON MATCH SET f2.strength = f2.strength + 1
-RETURN artist.name, type(f2), feature2.name
+USING PERIODIC COMMIT 5000
+LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
+MATCH (artist:Artist {name: line.Artist})
+MATCH (feature:Artist { name: line.Feature1 })
 
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
-MATCH (artist:Artist { name: line.Artist }), (feature3:Artist { name: line.Feature3 })
-MERGE (artist)-[f3:FEATURED]->(feature3)
-ON CREATE SET f3.strength = 1
-ON MATCH SET f3.strength = f3.strength + 1
-RETURN artist.name, type(f3), feature3.name
+MERGE (artist)-[f:FEATURES]->(feature)
+ON CREATE SET f.strength = 1
+ON MATCH SET f.strength = f.strength + 1
+RETURN artist.name, type(f), feature.name
 
-USING PERIODIC COMMIT 50
-    LOAD CSV WITH HEADERS from 'https://s3-us-west-1.amazonaws.com/tim-test000/artists-full.csv' as line
-MATCH (artist:Artist { name: line.Artist }), (feature4:Artist { name: line.Feature4 })
-MERGE (artist)-[f4:FEATURED]->(feature4)
-ON CREATE SET f4.strength = 1
-ON MATCH SET f4.strength = f4.strength + 1
-RETURN artist.name, type(f4), feature4.name
+# Repeat for all of the Feature1-Feature4 columns
 
-# Delete the connections to ’None’ for when there isn’t a feature in that column
-MATCH (artist:Artist { name:'None'})
+# Delete the connections to the placeholder ’None’ 
+MATCH (artist:Artist { name: 'None'})
 OPTIONAL MATCH (artist)-[r]-() 
 DELETE r 
 
