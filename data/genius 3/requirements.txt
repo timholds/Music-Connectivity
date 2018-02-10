@@ -1,0 +1,6 @@
+bs4
+selenium
+dateparser
+scrapy
+guppy==0.1.10
+IPython

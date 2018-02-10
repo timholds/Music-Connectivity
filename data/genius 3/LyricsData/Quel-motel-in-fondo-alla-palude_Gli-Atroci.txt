@@ -1,0 +1,13 @@
+Man: "Buonasera, in cosa posso servirVi ?"
+
+Girl: "Avete una stanza per questa notte ?"
+
+Man: "Ma certo signorina, Voi siete l'unica cliente del Motel questa notte"
+
+Girl: "Allora datemi la stanza migliore"
+
+Man: "Le consiglio senz'altro la stanza numero 666, c'è una splendida vista sulla palude"
+
+Girl: "Siete molto gentile, signor ...?"
+
+Man: "Peppino"

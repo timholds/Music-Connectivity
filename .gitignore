@@ -1,6 +1,7 @@
 passwords.py
 config.py
 neo-docker.pem
+neo.pem
 upwork-description.txt
 /flask-app/passwords.py
 /old

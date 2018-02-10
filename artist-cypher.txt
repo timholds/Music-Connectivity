@@ -27,9 +27,12 @@ MATCH (artist:Artist { name: 'None'})
 OPTIONAL MATCH (artist)-[r]-() 
 DELETE r 
 
-# List of people an artist has collated with
-MATCH (a:Artist { name: ‘Eminem’})-[f1:FEATURED]-(p:Artist)
+# List of top 10 people an artist has featured
+MATCH (a:Artist { name: ‘Eminem’})-[f1:FEATURES]->(p:Artist)
 RETURN a, p, f1.strength
+ORDER BY f1.strength DESC
+LIMIT 10;
+
 
 
 # Delete relationships to self
